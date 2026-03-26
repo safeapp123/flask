@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Login</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            background-color: #fff5fb;
+            /* Theme Background */
+            color: #333;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            width: 350px;
+            text-align: center;
+        }
+
+        .box {
+            background-color: white;
+            padding: 30px;
+            border: 1px solid #fbcfe8;
+            /* Soft pink border */
+            border-radius: 20px;
+            /* Rounded corners */
+            margin-bottom: 10px;
+            box-shadow: 0 10px 25px rgba(212, 0, 108, 0.05);
+        }
+
+        /* Back Button Style */
+        .back-link {
+            color: #d4006c;
+            text-decoration: none;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-bottom: 20px;
+            font-weight: 600;
+            transition: opacity 0.2s;
+        }
+
+        .back-link:hover {
+            opacity: 0.7;
+        }
+
+        h2 {
+            color: #d4006c;
+            font-weight: 800;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            color: #333;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #d4006c;
+        }
+
+        .btn-blue {
+            width: 100%;
+            padding: 12px;
+            background-color: #d4006c;
+            /* Primary Pink */
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+            box-shadow: 0 4px 12px rgba(212, 0, 108, 0.2);
+            transition: transform 0.2s;
+        }
+
+        .btn-blue:active {
+            transform: scale(0.98);
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 20px 0;
+            color: #94a3b8;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .divider:not(:empty)::before {
+            margin-right: 1.5em;
+        }
+
+        .divider:not(:empty)::after {
+            margin-left: 1.5em;
+        }
+
+        .otp-link {
+            color: #d4006c;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            background: none;
+            border: none;
+            display: block;
+            width: 100%;
+            margin: 15px 0;
+        }
+
+        .footer-box {
+            background-color: white;
+            padding: 20px;
+            border: 1px solid #fbcfe8;
+            border-radius: 15px;
+            font-size: 14px;
+            color: #64748b;
+        }
+
+        .footer-box a {
+            color: #d4006c;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .error {
+            color: #ed4956;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
+        .forgot-container {
+    text-align: center;
+    margin: 10px 0;
+}
+
+.forgot-link {
+    color: #c40069;
+    font-size: 13px;
+    opacity: 0.8;
+}
+
+.forgot-link:hover {
+    text-decoration: underline;
+}
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="box">
+            <a href="/welcome" class="back-link">&#8592; Back</a>
+
+            <h2 style="margin-bottom: 20px;">App Login</h2>
+            <input type="email" id="email" placeholder="Enter your email" oninput="clearError()">
+            <input type="password" id="password" placeholder="Password">
+
+            <div class="forgot-container">
+                <a href="/forgot_password" class="forgot-link">Forgot Password?</a>
+            </div>
+
+            <button class="btn-blue" onclick="loginPassword()">Log in</button>
+
+            <div class="divider">OR</div>
+
+            <button id="otpBtn" class="otp-link" onclick="loginOTP()">Log in with OTP</button>
+            <div id="error" class="error"></div>
+        </div>
+        <div class="footer-box">
+            Don't have an account? <a href="/signup">Sign up</a>
+        </div>
+    </div>
+
+    <script>
+        function loginPassword() {
+            const emailInput = document.getElementById('email');
+            const passwordInput = document.getElementById('password');
+
+            fetch("/login_password", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email: emailInput.value, password: passwordInput.value })
+            }).then(r => r.json()).then(d => {
+                if (d.status === "success") window.location.href = "/home";
+                else document.getElementById('error').innerText = "Invalid credentials";
+            });
+        }
+
+        function loginOTP() {
+            const btn = document.getElementById("otpBtn");
+            const emailInput = document.getElementById('email');
+
+            if (!emailInput.value) {
+                document.getElementById('error').innerText = "Please enter your email";
+                return;
+            }
+
+            btn.innerText = "Sending...";   // 🔥 LOADING EFFECT
+
+            fetch("/login_otp", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email: emailInput.value })
+            })
+                .then(r => {
+                    if (!r.ok) throw new Error("Server error");
+                    return r.json();
+                })
+                .then(d => {
+                    if (d.status === "success") {
+                        window.location.href = "/otp_verify";
+                    } else {
+                        document.getElementById('error').innerText = d.message || "User not found";
+                    }
+                })
+                .catch(() => {
+                    document.getElementById('error').innerText = "Server error. Try again.";
+                });
+        }
+
+        function clearError() {
+            document.getElementById('error').innerText = "";
+        }
+    </script>
+</body>
+
+</html>

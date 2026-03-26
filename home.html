@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>AI Safety App - Home</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            margin: 0;
+            padding-bottom: 70px;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #fff5fb;
+            user-select: none;
+            -webkit-user-select: none;
+            overflow-x: hidden;
+        }
+
+        .top-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 18px;
+            background: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .top-left {
+            display: flex;
+            align-items: center;
+        }
+
+        .top-left img {
+            height: 30px;
+            margin-right: 10px;
+        }
+
+        .top-icons i {
+            font-size: 20px;
+            margin-left: 15px;
+            color: #666;
+            cursor: pointer;
+        }
+
+        /* Medical Icon Color */
+        .fa-id-card-medical {
+            color: #d4006c !important;
+        }
+
+        /* --- SIDEBAR MENU STYLES --- */
+        .side-menu {
+            position: fixed;
+            top: 0;
+            right: -280px;
+            width: 260px;
+            height: 100%;
+            background: white;
+            box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+            z-index: 1001;
+            transition: 0.3s ease-in-out;
+            padding-top: 20px;
+        }
+
+        .side-menu.open {
+            right: 0;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 25px;
+            text-decoration: none;
+            color: #333;
+            font-weight: 600;
+            border-bottom: 1px solid #f9f9f9;
+        }
+
+        .menu-item i {
+            margin-right: 15px;
+            color: #d4006c;
+        }
+
+        .logout-btn {
+            color: #ff3b30;
+            border-top: 2px solid #eee;
+            margin-top: 20px;
+        }
+
+        /* --- NOTIFICATION MODAL STYLES --- */
+        .notif-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 999;
+        }
+
+        .notif-panel {
+            position: absolute;
+            top: 65px;
+            right: 15px;
+            width: 280px;
+            background: white;
+            border-radius: 15px;
+            padding: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .notif-title {
+            font-weight: bold;
+            color: #d4006c;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+        }
+
+        .notif-list {
+            font-size: 13px;
+            color: #555;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .notif-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid #f1f1f1;
+        }
+
+        /* --- MEDICAL ID MODAL STYLES --- */
+        .med-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 2000;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .med-card {
+            background: white;
+            width: 100%;
+            max-width: 400px;
+            margin: 50px auto;
+            border-radius: 20px;
+            overflow: hidden;
+            position: relative;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .med-header {
+            background: #d4006c;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .med-body {
+            padding: 20px;
+            max-height: 60vh;
+            overflow-y: auto;
+        }
+
+        .med-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #f1f1f1;
+        }
+
+        .med-label {
+            font-size: 11px;
+            color: #64748b;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .med-value {
+            font-size: 14px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .med-alert-box {
+            background: #fff1f2;
+            border: 1px solid #fecdd3;
+            padding: 10px;
+            border-radius: 10px;
+            margin-top: 10px;
+            color: #be123c;
+            font-size: 13px;
+        }
+
+        .close-med {
+            background: #333;
+            color: white;
+            border: none;
+            padding: 15px;
+            width: 100%;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .edit-med-btn {
+            background: #fdf2f8;
+            color: #d4006c;
+            border: 1px solid #fbcfe8;
+            padding: 10px;
+            width: 100%;
+            margin-top: 15px;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+            display: block;
+            text-align: center;
+        }
+
+        /* --- ORIGINAL STYLES --- */
+        .sos-wrapper {
+            text-align: center;
+            margin-top: 25px;
+        }
+
+        .sos-circle {
+            width: 55vw;
+            height: 55vw;
+            max-width: 260px;
+            max-height: 260px;
+            background: radial-gradient(circle, #ff5b8a, #d4006c);
+            border-radius: 50%;
+            margin: auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: clamp(24px, 6vw, 40px);
+            font-weight: bold;
+            box-shadow: 0 10px 35px rgba(255, 0, 102, 0.4);
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            position: relative;
+            overflow: hidden;
+            touch-action: manipulation;
+            border: none;
+        }
+
+        .sos-circle:active {
+            transform: scale(0.95);
+            box-shadow: 0 5px 15px rgba(255, 0, 102, 0.6);
+        }
+
+        .sos-subtext {
+            font-size: 14px;
+            color: #444;
+            margin-top: 10px;
+        }
+
+        .info-section {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .info-card {
+            flex: 1;
+            min-width: 140px;
+            padding: 14px;
+            border-radius: 14px;
+            background: #f2e7ff;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .green {
+            background: #e7ffe8;
+        }
+
+        .info-title {
+            font-size: 16px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            color: #333;
+        }
+
+        .info-title i {
+            margin-right: 8px;
+            color: #7b2ff7;
+        }
+
+        .box {
+            margin: 15px;
+            background: white;
+            padding: 16px;
+            border-radius: 16px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .title {
+            font-size: 17px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            color: #1b3d6d;
+        }
+
+        .title i {
+            margin-right: 10px;
+            font-size: 20px;
+        }
+
+        .dial-item {
+            background: #e9f3ff;
+            padding: 14px;
+            border-radius: 14px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .ai-chat-box {
+            background: linear-gradient(135deg, #e0e7ff, #f5f3ff);
+            cursor: pointer;
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background: white;
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            text-align: center;
+            color: #64748b;
+            font-size: 11px;
+            font-weight: 600;
+            flex: 1;
+        }
+
+        .nav-link i {
+            font-size: 20px;
+            margin-bottom: 3px;
+            display: block;
+        }
+
+        .nav-link.active {
+            color: #d4006c;
+        }
+
+        #fakeCallUI {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            color: white;
+            z-index: 1000;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            padding: 80px 0;
+            font-family: sans-serif;
+        }
+
+        .caller-info h1 {
+            margin: 0;
+            font-size: 32px;
+        }
+
+        .caller-info p {
+            font-size: 18px;
+            color: #aaa;
+            margin-top: 10px;
+        }
+
+        .call-actions {
+            display: flex;
+            gap: 80px;
+            margin-bottom: 50px;
+        }
+
+        .call-btn {
+            width: 75px;
+            height: 75px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            cursor: pointer;
+            border: none;
+        }
+
+        .decline {
+            background: #ff3b30;
+            color: white;
+        }
+
+        .accept {
+            background: #4cd964;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="medOverlay" class="med-overlay" onclick="toggleMedID()">
+        <div class="med-card" onclick="event.stopPropagation()">
+            <div class="med-header"><i class="fas fa-id-card-medical"></i> EMERGENCY MEDICAL ID</div>
+            <div class="med-body">
+                <div class="med-row"><span class="med-label">Name</span><span class="med-value">{{ user.first_name }} {{
+                        user.last_name }}</span></div>
+                <div class="med-row"><span class="med-label">Blood Group</span><span class="med-value"
+                        style="color:#d4006c;">{{ user.blood_group }}</span></div>
+                <div class="med-row"><span class="med-label">Age / DOB</span><span class="med-value">{{ user.age }} Yrs
+                        ({{ user.dob }})</span></div>
+                <div class="med-row"><span class="med-label">Organ Donor</span><span class="med-value">{{
+                        user.organ_donor }}</span></div>
+
+                <div class="section-title"
+                    style="margin-top:15px; font-size:11px; color:#d4006c; font-weight: bold; text-transform: uppercase;">
+                    Medical Alerts</div>
+                <div class="med-alert-box">
+                    <strong>Allergies:</strong> {{ user.allergies }}<br>
+                    <strong>History:</strong> {{ user.medical_history }}<br>
+                    <strong>Meds:</strong> {{ user.current_meds }}
+                </div>
+
+                <div class="section-title"
+                    style="margin-top:15px; font-size:11px; color:#d4006c; font-weight: bold; text-transform: uppercase;">
+                    Emergency Contact</div>
+                <div class="med-row"><span class="med-label">Primary Phone</span><span class="med-value">{{
+                        user.primary_emergency_phone }}</span></div>
+
+                <a href="/profile" class="edit-med-btn"><i class="fas fa-edit"></i> Edit History</a>
+            </div>
+            <button class="close-med" onclick="toggleMedID()">CLOSE</button>
+        </div>
+    </div>
+
+    <div id="notifOverlay" class="notif-overlay" onclick="toggleNotifications()">
+        <div class="notif-panel" onclick="event.stopPropagation()">
+            <div class="notif-title">I'M SAFE Updates</div>
+            <ul class="notif-list">
+                <li>✨ Welcome back! Your safety is our priority.</li>
+                <li>📍 Location tracking is currently active.</li>
+                <li>🔋 Battery level is being monitored.</li>
+                <li>🛡️ Emergency contacts are ready.</li>
+            </ul>
+        </div>
+    </div>
+
+    <div id="sideMenu" class="side-menu">
+
+        <div style="padding: 20px; text-align: center; border-bottom: 1px solid #eee;">
+            <h3 style="color: var(--primary); margin: 0;">Menu</h3>
+        </div>
+
+        <a href="/home" class="menu-item">
+            <i class="fas fa-house"></i> Home
+        </a>
+
+        <a href="/map" class="menu-item">
+            <i class="fas fa-map-location-dot"></i> Map
+        </a>
+
+        <a href="/contacts" class="menu-item">
+            <i class="fas fa-address-book"></i> Contacts
+        </a>
+
+        <a href="/record" class="menu-item">
+            <i class="fas fa-video"></i> Record
+        </a>
+
+        <a href="/profile" class="menu-item">
+            <i class="fas fa-notes-medical"></i> Medical History
+        </a>
+
+        <a href="/aichats" class="menu-item">
+            <i class="fas fa-comment-dots"></i> AI Chat
+        </a>
+
+        <a href="/logout" class="menu-item" style="color:#ff3b30;">
+            <i class="fas fa-sign-out-alt"></i> Log Out
+        </a>
+
+    </div>
+
+    <div class="top-bar">
+        <div class="top-left">
+            <img src="/static/images/logo.jpg" alt="logo">
+            <span style="font-size:20px;font-weight:bold;color:#d4006c">I'M SAFE</span>
+        </div>
+        <div class="top-icons">
+            <i class="fas fa-id-card-medical" onclick="toggleMedID()" title="View Medical ID"></i>
+            <i class="fas fa-bell" onclick="toggleNotifications()"></i>
+            <i class="fas fa-bars" onclick="toggleMenu()"></i>
+        </div>
+    </div>
+
+    <div class="sos-wrapper">
+        <button class="sos-circle" id="sosButton" onclick="triggerSOSEmergency()">SOS</button>
+        <p class="sos-subtext" id="sosInstruction">Tap SOS for immediate emergency alert and call</p>
+    </div>
+
+    <div class="info-section">
+        <div class="info-card">
+            <div class="info-title"><i class="fas fa-location-dot"></i> Location</div>
+            <p id="liveLocation" style="font-size: 14px; margin-top: 5px;">Fetching...</p>
+        </div>
+        <div class="info-card green">
+            <div class="info-title"><i class="fas fa-battery-three-quarters"></i> Battery</div>
+            <p id="batteryPercent" style="font-size: 14px; margin-top: 5px;">--%</p>
+        </div>
+    </div>
+
+    <div class="box" style="background: #e7ffe8; border-left: 5px solid #25d366;">
+        <div class="title" style="color: #075e54;"><i class="fab fa-whatsapp"></i> WhatsApp Alert</div>
+        <p style="font-size: 14px; color: #555;">Send your live location to your emergency contacts via WhatsApp.</p>
+        <button onclick="sendWhatsAppAlert()"
+            style="background: #25d366; color: white; border: none; padding: 12px 25px; border-radius: 12px; font-weight: bold; cursor: pointer; width: 100%;">Share
+            Location on WhatsApp</button>
+    </div>
+
+    <div class="box" style="text-align: center; border-left: 5px solid #7b2ff7;">
+        <div class="title" style="justify-content: center;"><i class="fas fa-user-secret"></i> Discomfort Tool</div>
+        <p style="font-size: 14px; color: #666;">Need an excuse to leave? Launch a fake call.</p>
+
+        <div class="feature-card">
+            <a href="{{ url_for('fake_call') }}" style="text-decoration: none;">
+                <button
+                    style="background: #7b2ff7; color: white; border: none; padding: 12px 25px; border-radius: 12px; font-weight: bold; cursor: pointer; width: 100%;">
+                    <i class="fas fa-phone" style="margin-right: 8px;"></i> Launch Fake Call UI
+                </button>
+            </a>
+        </div>
+    </div>
+
+    <div class="box" style="background: #f1f5f9; border-left: 5px solid #64748b;">
+        <div class="title" style="color: #475569;"><i class="fas fa-eye-slash"></i> Stealth Mode</div>
+        <p style="font-size: 14px; color: #64748b;">Send a silent alert without any sound or screen change.</p>
+        <button onclick="triggerSilentSOS()"
+            style="background: #475569; color: white; border: none; padding: 12px 25px; border-radius: 12px; font-weight: bold; cursor: pointer; width: 100%;">
+            Trigger Silent Alert
+        </button>
+    </div>
+
+    <div id="timer-section" class="box" style="text-align: center;">
+        <div class="title" style="justify-content: center;"><i class="fas fa-clock"></i> Safe Arrival Timer</div>
+        <p id="timer-status" style="font-size: 14px; color: #666;">Protect yourself when traveling alone.</p>
+        <div id="countdown" style="font-size: 32px; font-weight: bold; color: #d4006c; margin: 10px 0; display: none;">
+            00:00</div>
+        <div id="timer-controls">
+            <select id="minutes-select"
+                style="padding: 12px; border-radius: 12px; border: 1px solid #ddd; margin-bottom: 10px; width: 100%;">
+                <option value="10">10 Mins</option>
+                <option value="30">30 Mins</option>
+                <option value="60">1 Hour</option>
+            </select><br>
+            <button onclick="startSafetyTimer()"
+                style="background: #1570ef; color: white; border: none; padding: 14px 25px; border-radius: 12px; font-weight: bold; cursor: pointer; width: 100%;">Start
+                Safety Watch</button>
+        </div>
+        <button id="checkin-btn" onclick="stopSafetyTimer()"
+            style="display: none; background: #12b76a; color: white; border: none; padding: 14px 30px; border-radius: 12px; font-weight: bold; cursor: pointer; width: 100%;">I
+            am Safe (Check-in)</button>
+    </div>
+
+    <a href="/aichats" style="text-decoration:none;color:inherit;">
+        <div class="box ai-chat-box">
+            <div class="title"><i class="fas fa-robot"></i> AI Chat Assistant</div>
+            <p style="font-size: 14px; color: #555;">Talk to AI for safety guidance and emergency help.</p>
+        </div>
+    </a>
+
+    <div class="box">
+        <div class="title"><i class="fas fa-phone-volume"></i> Quick Emergency</div>
+        <a href="tel:112" class="dial-item">
+            <div><b>Emergency</b><br>112</div><i class="fas fa-phone"></i>
+        </a>
+        <a href="tel:100" class="dial-item">
+            <div><b>Police</b><br>100</div><i class="fas fa-phone"></i>
+        </a>
+    </div>
+
+    <div class="bottom-nav">
+
+        <a href="/home" class="nav-link active">
+            <i class="fas fa-house"></i>
+            Home
+        </a>
+
+        <a href="/map" class="nav-link">
+            <i class="fas fa-map-location-dot"></i>
+            Map
+        </a>
+
+        <a href="/record" class="nav-link">
+            <i class="fas fa-video"></i>
+            Record
+        </a>
+
+        <a href="/contacts" class="nav-link">
+            <i class="fas fa-address-book"></i>
+            Contacts
+        </a>
+
+        <a href="/aichats" class="nav-link">
+            <i class="fas fa-comment-dots"></i>
+            AI Chat
+        </a>
+
+    </div>
+
+    <script>
+        // --- NEW: Shake-to-Alert Logic ---
+        let lastX, lastY, lastZ;
+        let moveCounter = 0;
+
+        window.addEventListener('devicemotion', (event) => {
+            let acceleration = event.accelerationIncludingGravity;
+            let curX = acceleration.x;
+            let curY = acceleration.y;
+            let curZ = acceleration.z;
+
+            if (lastX !== undefined) {
+                let diffX = Math.abs(lastX - curX);
+                let diffY = Math.abs(lastY - curY);
+                let diffZ = Math.abs(lastZ - curZ);
+
+                // Threshold for a vigorous shake
+                if (diffX + diffY + diffZ > 30) {
+                    moveCounter++;
+                } else {
+                    moveCounter = Math.max(0, moveCounter - 1);
+                }
+
+                if (moveCounter > 5) {
+                    alert("Shake Detected! Triggering SOS...");
+                    triggerSOSEmergency(); // Calls your existing SOS logic
+                    moveCounter = 0;
+                }
+            }
+            lastX = curX; lastY = curY; lastZ = curZ;
+        });
+
+        // SOS Voice Detection Initialization
+        let recognition;
+
+        if (window.SpeechRecognition || window.webkitSpeechRecognition) {
+            recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+            recognition.continuous = true;
+            recognition.lang = 'en-US';
+
+            recognition.onresult = function (event) {
+                const transcript = event.results[event.results.length - 1][0].transcript.toUpperCase();
+                console.log("Heard:", transcript);
+
+                fetch('/process_voice_command', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text: transcript })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'trigger_sos') {
+                            alert("SOS TRIGGERED VIA VOICE!");
+                            triggerSOSEmergency();
+                        }
+                    });
+            };
+            recognition.onend = function () {
+                console.log("Restarting voice recognition...");
+                startVoiceMonitor();
+            };
+        }
+
+        function startVoiceMonitor() {
+            if (recognition) {
+                navigator.mediaDevices.getUserMedia({ audio: true })
+                    .then(() => {
+                        try {
+                            recognition.start();
+                        } catch (e) {
+                            console.log("Voice monitor already active");
+                        }
+                    })
+                    .catch(() => {
+                        console.log("Microphone permission denied");
+                    });
+            }
+        }
+
+        // Start voice monitor automatically on home load
+        window.addEventListener('load', startVoiceMonitor);
+
+        // Toggle Medical ID Modal
+        function toggleMedID() {
+            const overlay = document.getElementById('medOverlay');
+            overlay.style.display = (overlay.style.display === 'block') ? 'none' : 'block';
+        }
+
+        // Toggle Sidebar Menu
+        function toggleMenu() {
+            const menu = document.getElementById('sideMenu');
+            menu.classList.toggle('open');
+        }
+
+        // Toggle Notifications Modal
+        function toggleNotifications() {
+            const overlay = document.getElementById('notifOverlay');
+            overlay.style.display = (overlay.style.display === 'block') ? 'none' : 'block';
+        }
+
+        // Close Sidebar when clicking outside
+        window.onclick = function (event) {
+            const menu = document.getElementById('sideMenu');
+            const barsIcon = document.querySelector('.fa-bars');
+            const medIcon = document.querySelector('.fa-id-card-medical');
+            if (event.target !== barsIcon && !menu.contains(event.target) && event.target !== medIcon) {
+                menu.classList.remove('open');
+            }
+        }
+
+        // Fetch Live Geolocation
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(pos => {
+                document.getElementById("liveLocation").innerHTML = pos.coords.latitude.toFixed(4) + ", " + pos.coords.longitude.toFixed(4);
+            });
+        }
+
+        // Monitor Battery Status with Location Tracking
+        if ('getBattery' in navigator) {
+            navigator.getBattery().then(battery => {
+                const updateBatteryUI = () => {
+                    const level = Math.round(battery.level * 100);
+                    document.getElementById("batteryPercent").innerHTML = level + "%";
+                    if (level <= 15 && !battery.charging && !sessionStorage.getItem('batteryAlertSent')) {
+                        navigator.geolocation.getCurrentPosition((position) => {
+                            fetch('/trigger_battery_alert', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    level: level,
+                                    lat: position.coords.latitude,
+                                    lon: position.coords.longitude
+                                })
+                            });
+                            sessionStorage.setItem('batteryAlertSent', 'true');
+                        });
+                    }
+                };
+                updateBatteryUI();
+                battery.addEventListener('levelchange', updateBatteryUI);
+            });
+        }
+
+        // Speech Synthesis Helper
+        function speak(text) {
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.rate = 1;
+            window.speechSynthesis.speak(utterance);
+        }
+
+        // Send WhatsApp Location Alert
+        function sendWhatsAppAlert() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition((pos) => {
+                    const lat = pos.coords.latitude;
+                    const lon = pos.coords.longitude;
+                    const mapLink = `https://www.google.com/maps?q=${lat},${lon}`;
+                    const message = encodeURIComponent(`EMERGENCY: I need help! My current location is: ${mapLink}`);
+                    window.open(`https://wa.me/?text=${message}`, '_blank');
+                }, () => {
+                    alert("Please enable GPS to use this feature.");
+                });
+            }
+        }
+
+        async function triggerSOSEmergency() {
+
+            const emergencyContact = "{{ user.primary_emergency_phone or '112' }}";
+
+            speak("Emergency alert initiated");
+
+            navigator.geolocation.getCurrentPosition(async (pos) => {
+
+                const lat = pos.coords.latitude;
+                const lon = pos.coords.longitude;
+
+                fetch("/send_live_location", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        lat: lat,
+                        lon: lon
+                    })
+                })
+                    .then(res => {
+                        if (!res.ok) throw new Error("Server error");
+                    })
+                    .catch(err => {
+                        console.error("SOS Error:", err);
+                    });
+
+                startLiveTracking();
+
+            });
+
+            window.location.href = "tel:" + emergencyContact;
+        }
+        // --- SILENT SOS FUNCTION ---
+        function triggerSilentSOS() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(async (pos) => {
+                    try {
+                        const response = await fetch('/trigger_silent_alarm', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                lat: pos.coords.latitude,
+                                lon: pos.coords.longitude
+                            })
+                        });
+                        if (response.ok) { console.log("Silent alert successful."); }
+                    } catch (err) { console.error("Silent Alert Failed", err); }
+                });
+            }
+        }
+
+        let safetyTimer;
+        let timeLeft;
+
+        // Start Safety Arrival Watchdog
+        async function startSafetyTimer() {
+            const mins = document.getElementById('minutes-select').value;
+            navigator.geolocation.getCurrentPosition(async (pos) => {
+                const response = await fetch('/start_watchdog', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ minutes: mins, lat: pos.coords.latitude, lon: pos.coords.longitude })
+                });
+                if (response.ok) {
+                    timeLeft = mins * 60;
+                    document.getElementById('timer-controls').style.display = 'none';
+                    document.getElementById('countdown').style.display = 'block';
+                    document.getElementById('checkin-btn').style.display = 'block';
+                    document.getElementById('timer-status').innerText = "Server Watchdog Active!";
+                    safetyTimer = setInterval(updateCountdown, 1000);
+                }
+            }, () => alert("GPS is required to start the safety watch."));
+        }
+
+        // Update Timer Countdown
+        function updateCountdown() {
+            let mins = Math.floor(timeLeft / 60);
+            let secs = timeLeft % 60;
+
+            document.getElementById('countdown').innerText =
+                `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+
+            if (timeLeft <= 0) {
+                clearInterval(safetyTimer);
+
+                document.getElementById('timer-status').innerText =
+                    "Check-in Overdue! Triggering Alarm...";
+
+                // 🔥 PLAY SIREN
+                const alarm = new Audio("https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg");
+                alarm.loop = true;
+                alarm.play();
+
+                // 🔥 VIBRATION (mobile)
+                if ("vibrate" in navigator) {
+                    navigator.vibrate([500, 200, 500, 200, 500]);
+                }
+
+                // 🔥 OPTIONAL: TRIGGER SOS
+                triggerSOSEmergency();
+            }
+
+            timeLeft--;
+        }
+
+        // Stop Safety Arrival Timer
+        async function stopSafetyTimer() {
+            const response = await fetch('/stop_watchdog', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            });
+            if (response.ok) {
+                clearInterval(safetyTimer);
+                alert("Check-in successful! Watchdog deactivated.");
+                location.reload();
+            }
+        }
+
+        // Trigger Fake Call for Discomfort Tool
+        function triggerFakeCall() {
+            speak("Fake call initiated. Arriving in five seconds.");
+            setTimeout(() => {
+                if ("vibrate" in navigator) { navigator.vibrate([500, 200, 500, 200, 500]); }
+                alert("Incoming Fake Call...");
+            }, 5000);
+        }
+        // Start Live Location Tracking for Map View        
+        function startLiveTracking() {
+
+            if (navigator.geolocation) {
+
+                navigator.geolocation.watchPosition(function (position) {
+
+                    const lat = position.coords.latitude;
+                    const lon = position.coords.longitude;
+
+                    console.log("Live:", lat, lon);
+
+                    fetch("/send_live_location", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            lat: lat,
+                            lon: lon
+                        })
+                    })
+                        .then(res => {
+                            if (!res.ok) throw new Error("Tracking error");
+                        })
+                        .catch(err => {
+                            console.error("Tracking Error:", err);
+                        });
+                });
+
+            }
+
+        }
+    </script>
+</body>
+
+</html>

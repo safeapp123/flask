@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>I’m Safe - Record</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #c40069;
+            --accent: #ff2d95;
+            --bg: #f8fafc;
+            --dark: #1e293b;
+            --glass: rgba(255, 255, 255, 0.9);
+        }
+
+        body {
+            margin: 0;
+            padding-bottom: 100px;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: var(--bg);
+            color: var(--dark);
+        }
+
+        /* Professional Top Bar */
+        .top-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 18px;
+            background: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .top-left {
+            display: flex;
+            align-items: center;
+        }
+
+        .top-left img {
+            height: 30px;
+            margin-right: 10px;
+        }
+
+        .top-left i {
+            font-size: 24px;
+            color: var(--primary);
+        }
+
+        .top-title {
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            color: var(--primary);
+        }
+
+        .top-icons i {
+            font-size: 20px;
+            margin-left: 18px;
+            color: #64748b;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        /* Sidebar Styles */
+        .side-menu {
+            position: fixed;
+            top: 0;
+            right: -280px;
+            width: 260px;
+            height: 100%;
+            background: white;
+            box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+            z-index: 1001;
+            transition: 0.3s ease-in-out;
+            padding-top: 20px;
+        }
+
+        .side-menu.open {
+            right: 0;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 25px;
+            text-decoration: none;
+            color: #333;
+            font-weight: 600;
+            border-bottom: 1px solid #f9f9f9;
+        }
+
+        .menu-item i {
+            margin-right: 15px;
+            color: var(--primary);
+        }
+
+        .logout-btn {
+            color: #ff3b30;
+            border-top: 2px solid #eee;
+            margin-top: 20px;
+        }
+
+        /* Notif Overlay */
+        .notif-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 999;
+        }
+
+        .notif-panel {
+            position: absolute;
+            top: 65px;
+            right: 15px;
+            width: 280px;
+            background: white;
+            border-radius: 15px;
+            padding: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Medical ID Overlay */
+        .med-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 2000;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .med-card {
+            background: white;
+            width: 100%;
+            max-width: 400px;
+            margin: 50px auto;
+            border-radius: 20px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .med-header {
+            background: var(--primary);
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        /* Recording Styles */
+        .page-header {
+            padding: 25px 20px 10px;
+            background: linear-gradient(180deg, #fff 0%, var(--bg) 100%);
+        }
+
+        .page-header h2 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        .page-header p {
+            margin: 8px 0 0;
+            color: #64748b;
+            font-size: 15px;
+            line-height: 1.4;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            margin: 15px 20px;
+            border-radius: 20px;
+            border: 1px solid rgba(0, 0, 0, 0.03);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.03);
+        }
+
+        .history-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .video-container {
+            position: relative;
+            margin: 15px 20px;
+            border-radius: 16px;
+            overflow: hidden;
+            background: #000;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            border: 3px solid white;
+            display: none;
+        }
+
+        #videoPreview {
+            width: 100%;
+            display: block;
+        }
+
+        .mirrored {
+            transform: scaleX(-1);
+        }
+
+        #toggleCamBtn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+
+        #ghostOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            z-index: 9999;
+            display: none;
+        }
+
+        .indicator-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 15px;
+        }
+
+        #recordingIndicator {
+            color: #ef4444;
+            font-weight: 700;
+            animation: blink 1.2s infinite;
+        }
+
+        @keyframes blink {
+            50% {
+                opacity: 0.3;
+            }
+        }
+
+        .record-btn {
+            position: fixed;
+            bottom: 90px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--dark);
+            color: white;
+            padding: 16px 32px;
+            border-radius: 50px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            z-index: 101;
+        }
+
+        .record-btn.active {
+            background: var(--primary);
+        }
+
+        #ghostModeBtn {
+            background: #1e293b;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-weight: 600;
+            display: none;
+            align-items: center;
+            gap: 8px;
+            margin: 0 auto 10px;
+            cursor: pointer;
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background: var(--glass);
+            backdrop-filter: blur(15px);
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0 25px;
+            box-shadow: 0 -5px 25px rgba(0, 0, 0, 0.05);
+            z-index: 100;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            text-align: center;
+            color: #94a3b8;
+            font-size: 11px;
+            font-weight: 600;
+            flex: 1;
+        }
+
+        .nav-link i {
+            font-size: 22px;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        .nav-link.active {
+            color: var(--primary);
+        }
+
+        .flex-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="ghostOverlay" ontouchstart="handleGhostTap()" onclick="handleGhostTap()"></div>
+
+    <div id="sideMenu" class="side-menu">
+
+        <div style="padding: 20px; text-align: center; border-bottom: 1px solid #eee;">
+            <h3 style="color: var(--primary); margin: 0;">Menu</h3>
+        </div>
+
+        <a href="/home" class="menu-item">
+            <i class="fas fa-house"></i> Home
+        </a>
+
+        <a href="/map" class="menu-item">
+            <i class="fas fa-map-location-dot"></i> Map
+        </a>
+
+        <a href="/contacts" class="menu-item">
+            <i class="fas fa-address-book"></i> Contacts
+        </a>
+
+        <a href="/record" class="menu-item">
+            <i class="fas fa-video"></i> Record
+        </a>
+
+        <a href="/profile" class="menu-item">
+            <i class="fas fa-notes-medical"></i> Medical History
+        </a>
+
+        <a href="/aichats" class="menu-item">
+            <i class="fas fa-comment-dots"></i> AI Chat
+        </a>
+
+        <a href="/logout" class="menu-item" style="color:#ff3b30;">
+            <i class="fas fa-sign-out-alt"></i> Log Out
+        </a>
+
+    </div>
+
+    <div id="notifOverlay" class="notif-overlay" onclick="toggleNotifications()">
+        <div class="notif-panel" onclick="event.stopPropagation()">
+            <div style="font-weight:bold; color:var(--primary); border-bottom:1px solid #eee; padding-bottom:5px;">I'M
+                SAFE Updates</div>
+            <p style="font-size:12px; color:#666; margin-top:10px;">Recording mode active. Your video will be stored in
+                the Evidence Vault.</p>
+        </div>
+    </div>
+
+    <div id="medOverlay" class="med-overlay" onclick="toggleMedID()">
+        <div class="med-card" onclick="event.stopPropagation()">
+            <div class="med-header"><i class="fas fa-id-card-medical"></i> EMERGENCY MEDICAL ID</div>
+            <div style="padding:20px; text-align:center;">
+                <p>Profile details are synced from your account.</p>
+                <a href="/profile" style="color:var(--primary); font-weight:bold;">Update Info</a>
+            </div>
+            <button style="width:100%; padding:15px; background:#333; color:white; border:none;"
+                onclick="toggleMedID()">CLOSE</button>
+        </div>
+    </div>
+
+    <div class="top-bar">
+        <div class="top-left">
+            <img src="/static/images/logo.jpg" alt="logo">
+            <span style="font-size:20px;font-weight:bold;color:#d4006c">I'M SAFE</span>
+        </div>
+        <div class="top-icons">
+            <i class="fas fa-id-card-medical" onclick="toggleMedID()" style="color:var(--primary);"></i>
+            <i class="fas fa-bell" onclick="toggleNotifications()"></i>
+            <i class="fas fa-bars" onclick="toggleMenu()"></i>
+        </div>
+    </div>
+
+    <div class="page-header">
+        <h2>Anonymous Recording</h2>
+        <p id="status-text">Your guardian in the shadows. Discreetly capture your surroundings for evidence.</p>
+    </div>
+
+    <div class="video-container" id="previewBox">
+        <video id="videoPreview" autoplay muted playsinline></video>
+        <button id="toggleCamBtn" onclick="switchCamera()"><i class="fas fa-camera-rotate"></i></button>
+    </div>
+
+    <button id="ghostModeBtn" onclick="enterGhostMode()">
+        <i class="fas fa-ghost"></i> Ghost Mode
+    </button>
+
+    <div id="recordingIndicator" class="indicator-container" style="display:none;">
+        <i class="fas fa-circle"></i> RECORDING ACTIVE
+    </div>
+
+    <a href="/my_recordings" class="card history-card">
+        <div class="flex-row">
+            <div style="background: #fff0f6; padding: 12px; border-radius: 12px;">
+                <i class="fas fa-clapperboard" style="font-size: 24px; color: var(--primary);"></i>
+            </div>
+            <div>
+                <b style="font-size: 16px;">Evidence Vault</b>
+                <p class="text-muted">Review your saved safety clips</p>
+            </div>
+        </div>
+        <i class="fas fa-chevron-right" style="color: #cbd5e1;"></i>
+    </a>
+
+    <div class="record-btn" id="recordBtn" onclick="toggleRecording()">
+        <i class="fas fa-video" id="btnIcon"></i>
+        <span id="btnText">Start Recording</span>
+    </div>
+
+    <div class="bottom-nav">
+
+        <a href="/home" class="nav-link">
+            <i class="fas fa-house"></i>
+            Home
+        </a>
+
+        <a href="/map" class="nav-link">
+            <i class="fas fa-map-location-dot"></i>
+            Map
+        </a>
+
+        <a href="/record" class="nav-link">
+            <i class="fas fa-video"></i>
+            Record
+        </a>
+
+        <a href="/contacts" class="nav-link">
+            <i class="fas fa-address-book"></i>
+            Contacts
+        </a>
+
+        <a href="/aichats" class="nav-link">
+            <i class="fas fa-comment-dots"></i>
+            AI Chat
+        </a>
+
+    </div>
+    <script>
+        /* --- Navigation Logic --- */
+        function toggleMenu() { document.getElementById('sideMenu').classList.toggle('open'); }
+        function toggleNotifications() {
+            const n = document.getElementById('notifOverlay');
+            n.style.display = (n.style.display === 'block') ? 'none' : 'block';
+        }
+        function toggleMedID() {
+            const m = document.getElementById('medOverlay');
+            m.style.display = (m.style.display === 'block') ? 'none' : 'block';
+        }
+
+        /* --- Existing Recording Logic --- */
+        let mediaRecorder;
+        let recordedChunks = [];
+        let isRecording = false;
+        let currentFacingMode = "user";
+        let stream = null;
+        let lastTap = 0;
+
+        async function switchCamera() {
+            if (!isRecording) return;
+            if (stream) { stream.getTracks().forEach(track => track.stop()); }
+            currentFacingMode = (currentFacingMode === "user") ? "environment" : "user";
+            await startCamera();
+        }
+
+        async function startCamera() {
+            try {
+                const video = document.getElementById('videoPreview');
+                stream = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: currentFacingMode },
+                    audio: true
+                });
+                video.srcObject = stream;
+                if (currentFacingMode === "user") { video.classList.add('mirrored'); }
+                else { video.classList.remove('mirrored'); }
+                return stream;
+            } catch (err) {
+                alert("Camera/Microphone access required.");
+                return null;
+            }
+        }
+
+        function enterGhostMode() {
+            document.getElementById('ghostOverlay').style.display = 'block';
+            alert("Ghost Mode active. Screen is black, recording continues. DOUBLE-TAP to exit.");
+        }
+
+        function handleGhostTap() {
+            const now = new Date().getTime();
+            if (now - lastTap < 300) { document.getElementById('ghostOverlay').style.display = 'none'; }
+            lastTap = now;
+        }
+
+        async function toggleRecording() {
+            const btn = document.getElementById('recordBtn');
+            const btnText = document.getElementById('btnText');
+            const btnIcon = document.getElementById('btnIcon');
+            const previewBox = document.getElementById('previewBox');
+            const indicator = document.getElementById('recordingIndicator');
+            const ghostBtn = document.getElementById('ghostModeBtn');
+
+            if (!isRecording) {
+                const currentStream = await startCamera();
+                if (!currentStream) return;
+                previewBox.style.display = "block";
+                indicator.style.display = "flex";
+                ghostBtn.style.display = "flex";
+                mediaRecorder = new MediaRecorder(currentStream);
+                mediaRecorder.ondataavailable = (e) => { if (e.data.size > 0) recordedChunks.push(e.data); };
+                mediaRecorder.onstop = uploadRecording;
+                mediaRecorder.start();
+                isRecording = true;
+                btnText.innerText = "Stop & Save";
+                btnIcon.className = "fas fa-stop-circle";
+                btn.classList.add('active');
+            } else {
+                mediaRecorder.stop();
+                if (stream) { stream.getTracks().forEach(track => track.stop()); }
+                previewBox.style.display = "none";
+                indicator.style.display = "none";
+                ghostBtn.style.display = "none";
+                document.getElementById('ghostOverlay').style.display = 'none';
+                isRecording = false;
+                btnText.innerText = "Start Recording";
+                btnIcon.className = "fas fa-video";
+                btn.classList.remove('active');
+            }
+        }
+
+        async function uploadRecording() {
+            const blob = new Blob(recordedChunks, { type: 'video/webm' });
+            navigator.geolocation.getCurrentPosition(async (pos) => {
+                const formData = new FormData();
+                formData.append('video_data', blob);
+                formData.append('lat', pos.coords.latitude);
+                formData.append('lon', pos.coords.longitude);
+                try {
+                    const response = await fetch('/save_recording', { method: 'POST', body: formData });
+                    const data = await response.json();
+                    if (response.ok) {
+                        alert("Evidence and GPS location successfully uploaded. Email alerts have been sent.");
+                        if (data.whatsapp_link) { window.open(data.whatsapp_link, '_blank'); }
+                    }
+                } catch (error) { console.error("Upload failed:", error); }
+            }, () => { alert("GPS location is required for emergency evidence."); });
+            recordedChunks = [];
+        }
+    </script>
+    <script>
+
+        const currentPage = window.location.pathname;
+
+        document.querySelectorAll(".nav-link").forEach(link => {
+
+            if (currentPage.includes(link.getAttribute("href"))) {
+                link.classList.add("active");
+            }
+
+        });
+
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Safety Map</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Leaflet -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+        :root {
+            --primary: #c40069;
+            --accent: #ff2d95;
+            --bg: #f8fafc;
+            --dark: #1e293b;
+            --glass: rgba(255, 255, 255, 0.9);
+        }
+
+        body {
+            margin: 0;
+            padding-bottom: 100px;
+            font-family: 'Segoe UI', sans-serif;
+            background: var(--bg);
+        }
+
+        /* HEADER (same as record page) */
+        .top-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 18px;
+            background: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .top-left {
+            display: flex;
+            align-items: center;
+        }
+
+        .top-left img {
+            height: 30px;
+            margin-right: 10px;
+        }
+
+        .top-icons i {
+            font-size: 20px;
+            margin-left: 18px;
+            color: #64748b;
+            cursor: pointer;
+        }
+
+        /* PAGE HEADER */
+        .page-header {
+            padding: 25px 20px 10px;
+        }
+
+        .page-header h2 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        .page-header p {
+            margin-top: 5px;
+            color: #64748b;
+        }
+
+        /* Sidebar */
+        .side-menu {
+            position: fixed;
+            top: 0;
+            right: -280px;
+            width: 260px;
+            height: 100%;
+            background: white;
+            box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+            z-index: 1001;
+            transition: 0.3s ease-in-out;
+            padding-top: 20px;
+        }
+
+        .side-menu.open {
+            right: 0;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 25px;
+            text-decoration: none;
+            color: #333;
+            font-weight: 600;
+            border-bottom: 1px solid #f9f9f9;
+        }
+
+        .menu-item i {
+            margin-right: 15px;
+            color: var(--primary);
+        }
+
+        .notif-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 999;
+        }
+
+        .notif-card {
+            background: white;
+            width: 90%;
+            max-width: 320px;
+            margin: 120px auto;
+            padding: 18px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .notif-card h3 {
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .notif-item {
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+            font-size: 14px;
+        }
+
+        .logout-btn {
+            color: #ff3b30;
+            border-top: 2px solid #eee;
+            margin-top: 20px;
+        }
+
+        /* MAP CARD STYLE (same as record page cards) */
+        #map {
+            position: relative;
+            margin: 15px 20px;
+            height: 65vh;
+            border-radius: 20px;
+            overflow: hidden;
+            border: 3px solid white;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+        }
+
+        /* BOTTOM NAV */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background: var(--glass);
+            backdrop-filter: blur(15px);
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0 25px;
+            box-shadow: 0 -5px 25px rgba(0, 0, 0, 0.05);
+        }
+
+        .nav-link {
+            text-decoration: none;
+            text-align: center;
+            color: #94a3b8;
+            font-size: 11px;
+            font-weight: 600;
+            flex: 1;
+        }
+
+        .nav-link i {
+            font-size: 22px;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        .nav-link.active {
+            color: var(--primary);
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- HEADER -->
+    <div class="top-bar">
+        <div class="top-left">
+            <img src="/static/images/logo.jpg" alt="logo">
+            <span style="font-size:20px;font-weight:bold;color:#d4006c">I'M SAFE</span>
+        </div>
+        <div class="top-icons">
+            <i class="fas fa-id-card-medical"></i>
+            <i class="fas fa-bell" onclick="toggleNotifications()"></i>
+            <i class="fas fa-bars" onclick="toggleMenu()"></i>
+        </div>
+    </div>
+
+    <div id="notifOverlay" class="notif-overlay" onclick="toggleNotifications()">
+        <div class="notif-card" onclick="event.stopPropagation()">
+            <h3>I'M SAFE Updates</h3>
+
+            <div id="notifWelcome" class="notif-item">✨ Welcome back!</div>
+            <div id="notifLocation" class="notif-item">📍 Getting location...</div>
+            <div id="notifNearby" class="notif-item">🔎 Checking nearby safety places...</div>
+            <div id="notifBattery" class="notif-item">🔋 Checking battery...</div>
+        </div>
+    </div>
+
+    <!-- PAGE TITLE -->
+    <div class="page-header">
+        <h2>Safety Map</h2>
+        <p>Track your live location in real-time</p>
+    </div>
+
+    <!-- MAP -->
+    <div id="map"></div>
+
+    <!-- BOTTOM NAV -->
+    <div class="bottom-nav">
+
+        <a href="/home" class="nav-link">
+            <i class="fas fa-house"></i>
+            Home
+        </a>
+
+        <a href="/map" class="nav-link">
+            <i class="fas fa-map-location-dot"></i>
+            Map
+        </a>
+
+        <a href="/record" class="nav-link">
+            <i class="fas fa-video"></i>
+            Record
+        </a>
+
+        <a href="/contacts" class="nav-link">
+            <i class="fas fa-address-book"></i>
+            Contacts
+        </a>
+
+        <a href="/aichats" class="nav-link">
+            <i class="fas fa-comment-dots"></i>
+            AI Chat
+        </a>
+
+    </div>
+    <div id="sideMenu" class="side-menu">
+
+        <div style="padding: 20px; text-align: center; border-bottom: 1px solid #eee;">
+            <h3 style="color: var(--primary); margin: 0;">Menu</h3>
+        </div>
+
+        <a href="/home" class="menu-item">
+            <i class="fas fa-house"></i> Home
+        </a>
+
+        <a href="/map" class="menu-item">
+            <i class="fas fa-map-location-dot"></i> Map
+        </a>
+
+        <a href="/contacts" class="menu-item">
+            <i class="fas fa-address-book"></i> Contacts
+        </a>
+
+        <a href="/record" class="menu-item">
+            <i class="fas fa-video"></i> Record
+        </a>
+
+        <a href="/profile" class="menu-item">
+            <i class="fas fa-notes-medical"></i> Medical History
+        </a>
+
+        <a href="/aichats" class="menu-item">
+            <i class="fas fa-comment-dots"></i> AI Chat
+        </a>
+
+        <a href="/logout" class="menu-item" style="color:#ff3b30;">
+            <i class="fas fa-sign-out-alt"></i> Log Out
+        </a>
+
+    </div>
+
+    <!-- Leaflet -->
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+    <script>
+        function updateNotifications(lat, lng) {
+
+            // 📍 Show current location
+            document.getElementById("notifLocation").innerText =
+                `📍 Location: ${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+
+            // 🏥 Nearby info (simple logic)
+            document.getElementById("notifNearby").innerText =
+                "🔎 Searching nearby police & hospitals...";
+
+            // 🔋 Battery API
+            if (navigator.getBattery) {
+                navigator.getBattery().then(function (battery) {
+                    let level = Math.round(battery.level * 100);
+                    document.getElementById("notifBattery").innerText =
+                        `🔋 Battery: ${level}%`;
+                });
+            }
+        }
+        let map;
+        let marker;
+        let pathCoords = [];
+        let polyline;
+        let nearbyLayer = L.layerGroup();
+
+        function initMap(lat, lng) {
+            map = L.map('map').setView([lat, lng], 15);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap'
+            }).addTo(map);   // ✅ correct
+
+            nearbyLayer = L.layerGroup().addTo(map);  // ✅ correct
+
+            marker = L.marker([lat, lng]).addTo(map)   // ✅ correct
+                .bindPopup("📍 You are here")
+                .openPopup();
+
+            polyline = L.polyline(pathCoords, {
+                color: 'blue',
+                weight: 5
+            }).addTo(map);
+
+            L.circle([lat, lng], {
+                color: 'green',
+                fillColor: '#a5f3a1',
+                fillOpacity: 0.2,
+                radius: 1000
+            }).addTo(map);
+
+            if (!window.placesLoaded) {
+                loadNearbyPlaces(lat, lng);
+                window.placesLoaded = true;
+            }
+        }
+
+        function updateLocation(position) {
+            const lat = position.coords.latitude;
+            const lng = position.coords.longitude;
+
+            pathCoords.push([lat, lng]);
+
+            if (!map) {
+                initMap(lat, lng);
+            } else {
+                marker.setLatLng([lat, lng]);
+                map.setView([lat, lng]);
+
+                polyline.setLatLngs(pathCoords);
+            }
+            // 🔥 ADD THIS LINE
+            updateNotifications(lat, lng);
+        }
+
+        function errorHandler(error) {
+            alert("⚠️ Please allow location access!");
+            console.log(error);
+        }
+
+        // 🔥 CLEAN VERSION (LIMITED MARKERS)
+        function loadNearbyPlaces(lat, lng) {
+            let query = `
+        [out:json];
+        (
+          node["amenity"="police"](around:1000,${lat},${lng});
+          node["amenity"="hospital"](around:1000,${lat},${lng});
+        );
+        out;
+        `;
+
+            fetch("https://overpass-api.de/api/interpreter", {
+                method: "POST",
+                body: query
+            })
+                .then(res => {
+                    if (!res.ok) {
+                        throw new Error("API failed");
+                    }
+                    return res.json();
+                })
+                .then(data => {
+
+                    if (!data.elements) {
+                        throw new Error("No data from API");
+                    }
+
+                    let count = 0;
+
+                    data.elements.forEach(place => {
+
+                        if (count >= 10) return;
+
+                        let isPolice = place.tags.amenity === "police";
+
+                        let icon = L.icon({
+                            iconUrl: isPolice
+                                ? "https://cdn-icons-png.flaticon.com/512/684/684908.png"
+                                : "https://cdn-icons-png.flaticon.com/512/1484/1484849.png",
+                            iconSize: [25, 25]
+                        });
+
+                        L.marker([place.lat, place.lon], { icon: icon })
+                            .addTo(nearbyLayer)
+                            .bindPopup(
+                                `${isPolice ? "👮 Police Station" : "🏥 Hospital"}<br>
+                ${place.tags.name || "Nearby Location"}`
+                            );
+
+                        count++;
+                    });
+
+                })
+                .catch(err => {
+                    console.log("⚠️ API Error:", err);
+
+                    // 🔥 SHOW IN NOTIFICATION
+                    document.getElementById("notifNearby").innerText =
+                        "⚠️ Nearby places unavailable (server busy)";
+                });
+        }
+
+        // 📍 Live tracking
+        navigator.geolocation.watchPosition(
+            updateLocation,
+            errorHandler,
+            {
+                enableHighAccuracy: true
+            }
+        );
+
+        // ACTIVE NAV
+        const currentPage = window.location.pathname;
+        document.querySelectorAll(".nav-link").forEach(link => {
+            if (currentPage.includes(link.getAttribute("href"))) {
+                link.classList.add("active");
+            }
+        });
+
+        function toggleMenu() {
+            document.getElementById('sideMenu').classList.toggle('open');
+        }
+
+        function toggleNotifications() {
+            const panel = document.getElementById("notifOverlay");
+
+            if (panel.style.display === "block") {
+                panel.style.display = "none";
+            } else {
+                panel.style.display = "block";
+            }
+        }
+    </script>
+
+</body>
+
+</html>

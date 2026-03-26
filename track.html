@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>Live Tracking</title>
+
+    <style>
+        #map {
+            height: 100vh;
+            width: 100%;
+        }
+    </style>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+</head>
+
+<body>
+
+    <div id="map"></div>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+
+        let map = L.map('map').setView([20, 78], 5);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19
+        }).addTo(map);
+
+        let marker;
+
+        function updateLocation() {
+
+            fetch("/get_live_location/{{ session['email'] }}")
+                .then(res => res.json())
+                .then(data => {
+
+                    console.log(data); // 🔍 debug
+
+                    if (data.lat !== null && data.lon !== null) {
+
+                        let lat = parseFloat(data.lat);
+                        let lon = parseFloat(data.lon);
+
+                        let pos = [lat, lon];
+
+                        if (marker) {
+                            marker.setLatLng(pos);
+                        } else {
+                            marker = L.marker(pos).addTo(map)
+                                .bindPopup("User Location")
+                                .openPopup();
+                        }
+
+                        map.setView(pos, 16);
+                    }
+
+                });
+
+        }
+
+        // 🔥 run immediately + every 3 sec
+        updateLocation();
+        setInterval(updateLocation, 3000);
+
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Incoming Call</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --ios-red: #ff3b30;
+            --ios-green: #4cd964;
+            --glass: rgba(255, 255, 255, 0.1);
+        }
+
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto;
+            background-color: #000;
+            overflow: hidden;
+            color: white;
+        }
+
+        /* CONFIGURATION UI */
+        #setup {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background: #fff5fb;
+            padding: 30px;
+            box-sizing: border-box;
+            color: #333;
+        }
+
+        .config-card {
+            background: white;
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            width: 100%;
+            max-width: 350px;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+
+        .start-btn {
+            background: #7b2ff7;
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 12px;
+            width: 100%;
+            font-weight: bold;
+            font-size: 18px;
+            cursor: pointer;
+        }
+
+        /* REALISTIC CALL SCREEN */
+        #callScreen {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, #1e3c72, #2a5298, #000);
+            z-index: 10000;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            padding: 100px 0 80px 0;
+            box-sizing: border-box;
+        }
+
+        .caller-id h1 {
+            font-size: 40px;
+            margin: 5px 0;
+            font-weight: 300;
+        }
+
+        .caller-id p {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 18px;
+            margin: 0;
+            letter-spacing: 1px;
+        }
+
+        /* QUICK ACTIONS (Remind, Message) */
+        .quick-actions {
+            display: flex;
+            gap: 60px;
+            margin-bottom: 20px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .q-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+        }
+
+        /* ACCEPT/DECLINE BUTTONS */
+        .main-actions {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            padding: 0 30px;
+            box-sizing: border-box;
+        }
+
+        .btn-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-container span {
+            font-size: 14px;
+            font-weight: 400;
+        }
+
+        .circle-btn {
+            width: 75px;
+            height: 75px;
+            border-radius: 50%;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 32px;
+            cursor: pointer;
+            transition: transform 0.1s ease;
+        }
+
+        .circle-btn:active {
+            transform: scale(0.9);
+        }
+
+        .decline {
+            background-color: var(--ios-red);
+        }
+
+        .accept {
+            background-color: var(--ios-green);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0px rgba(76, 217, 100, 0.5);
+            }
+
+            70% {
+                box-shadow: 0 0 0 20px rgba(76, 217, 100, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0px rgba(76, 217, 100, 0);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="setup">
+        <div class="config-card">
+            <h2 style="margin-top:0; color:#d4006c;">Fake Call Config</h2>
+            <label>Caller Name</label>
+            <input type="text" id="callerName" placeholder="e.g. Mom, Police, Boss">
+
+            <label>Timer (Seconds)</label>
+            <input type="number" id="timerSeconds" value="5">
+
+            <button class="start-btn" onclick="initFakeCall()">Schedule Call</button>
+            <p style="font-size: 12px; color: #888; margin-top: 15px;">After clicking, you can put the phone down. Do
+                not close the browser.</p>
+        </div>
+        <a href="/home" style="margin-top: 20px; color: #7b2ff7; text-decoration: none; font-weight: bold;">Cancel</a>
+    </div>
+
+    <div id="callScreen">
+        <div class="caller-id">
+            <p id="callStatus">Incoming Call</p>
+            <h1 id="displayCallerName">Mom</h1>
+        </div>
+
+        <div class="ui-middle">
+            <div class="quick-actions">
+                <div class="q-item"><i class="fas fa-clock"></i><span>Remind Me</span></div>
+                <div class="q-item"><i class="fas fa-comment"></i><span>Message</span></div>
+            </div>
+        </div>
+
+        <div class="main-actions">
+            <div class="btn-container decline-container">
+                <button class="circle-btn decline" onclick="endCall()">
+                    <i class="fas fa-phone-slash"></i>
+                </button>
+                <span>Decline</span>
+            </div>
+            <div class="btn-container accept-container">
+                <button class="circle-btn accept" onclick="acceptCall()">
+                    <i class="fas fa-phone"></i>
+                </button>
+                <span>Accept</span>
+            </div>
+        </div>
+
+        <audio id="ringtone" src="{{ url_for('static', filename='audio/ringtone.mp3') }}" loop></audio>
+        <audio id="voiceScript" src="{{ url_for('static', filename='audio/mom_voice.mp3') }}"></audio>
+    </div>
+
+    <script>
+        let callTimer;
+        let secondsActive = 0;
+
+        function initFakeCall() {
+            const name = document.getElementById('callerName').value || "Mom";
+            const seconds = document.getElementById('timerSeconds').value || 5;
+
+            document.getElementById('displayCallerName').innerText = name;
+
+            document.getElementById('setup').innerHTML = `
+                <div style="text-align:center">
+                    <h2 style="color:#d4006c">Scheduled</h2>
+                    <p>Incoming call from <b>${name}</b> in ${seconds}s</p>
+                    <div style="font-size:40px; margin:20px 0;">⌛</div>
+                    <button onclick="location.reload()" style="background:none; border:none; color:blue; text-decoration:underline;">Cancel</button>
+                </div>
+            `;
+
+            setTimeout(triggerCall, seconds * 1000);
+        }
+
+        function triggerCall() {
+            const screen = document.getElementById('callScreen');
+            const ringtone = document.getElementById('ringtone');
+
+            screen.style.display = 'flex';
+            ringtone.play().catch(err => {
+                console.log("Audio requires user interaction first.");
+                alert("Tap OK to start call sound.");
+                ringtone.play();
+            });
+
+            if (navigator.vibrate) {
+                navigator.vibrate([1000, 500, 1000, 500, 1000, 500]);
+            }
+        }
+
+        function acceptCall() {
+            // 1. Stop Ringtone
+            const ringtone = document.getElementById('ringtone');
+            ringtone.pause();
+            ringtone.currentTime = 0;
+
+            // 2. Play Mom's Voice Script
+            const voice = document.getElementById('voiceScript');
+            voice.play();
+
+            // 3. UI Changes for Active Call
+            document.getElementById('callStatus').innerText = "00:00";
+            document.querySelector('.accept-container').style.display = 'none'; // Hide Accept button
+            document.querySelector('.decline-container').style.width = "100%"; // Center Decline button
+            document.querySelector('.ui-middle').style.visibility = "hidden"; // Hide minor UI items
+
+            // 4. Start Duration Timer
+            callTimer = setInterval(() => {
+                secondsActive++;
+                let m = Math.floor(secondsActive / 60);
+                let s = secondsActive % 60;
+                document.getElementById('callStatus').innerText =
+                    `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
+            }, 1000);
+
+            // Cancel vibration if still active
+            if (navigator.vibrate) { navigator.vibrate(0); }
+        }
+
+        function endCall() {
+            if (callTimer) clearInterval(callTimer);
+
+            const ringtone = document.getElementById('ringtone');
+            const voice = document.getElementById('voiceScript');
+
+            ringtone.pause();
+            voice.pause();
+            ringtone.currentTime = 0;
+            voice.currentTime = 0;
+
+            document.getElementById('callScreen').style.display = 'none';
+            window.location.href = "/home";
+        }
+    </script>
+</body>
+
+</html>

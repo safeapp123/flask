@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome - I'M SAFE</title>
+
+    <style>
+        :root {
+            --primary-color: #79003c;
+            --accent-color: #a0004e;
+            --text-main: #333;
+            --text-muted: #666;
+            --bg-color: #ffffff;
+        }
+
+        body {
+            font-family: "Segoe UI", Roboto, Arial;
+            margin: 0;
+            background: #f5f6fa;
+        }
+
+        /* MAIN CONTAINER */
+        .main-content {
+            max-width: 420px;
+            margin: auto;
+            min-height: 100vh;
+            background: #ffffff;
+            padding: 20px;
+
+            display: flex;
+            flex-direction: column;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 25px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        /* LEFT SIDE (LOGO + NAME) */
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header-left img {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            object-fit: cover;
+        }
+
+        .header-left span {
+            font-size: 16px;
+            font-weight: 600;
+            color: #a0004e;
+            letter-spacing: 0.5px;
+        }
+
+        /* SKIP POSITION */
+        .skip-container {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 10px;
+            /* 🔥 space below header */
+        }
+
+        .skip-top {
+            background: none;
+            border: none;
+            color: #a0004e;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .center-content {
+            margin-top: 25px;
+            text-align: center;
+        }
+
+
+        /* IMAGE CARD */
+        .illustration {
+            margin: 15px 0 5px 0;
+            /* 🔥 less bottom space */
+        }
+
+        .illustration img {
+            width: 75%;
+            max-width: 240px;
+            border-radius: 18px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .title {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .subtext {
+            font-size: 14px;
+            color: #666;
+            margin-top: 5px;
+            /* 🔥 reduce gap */
+            padding: 0 20px;
+            line-height: 1.5;
+        }
+
+        .bottom-area {
+            margin-top: 40px;
+            /* 🔥 control spacing manually */
+            margin-bottom: 30px;
+            /* 🔥 lift from bottom */
+            text-align: center;
+        }
+
+        .btn-next {
+            width: 100%;
+            padding: 14px;
+            border-radius: 30px;
+            border: none;
+            background: linear-gradient(135deg, #a0004e, #79003c);
+            color: white;
+            font-size: 16px;
+            box-shadow: 0 6px 15px rgba(160, 0, 78, 0.3);
+            margin-top: 10px;
+            /* 🔥 small breathing space */
+        }
+
+        /* DOTS */
+        .dots {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            margin-top: 12px;
+        }
+
+        .dot {
+            width: 6px;
+            height: 6px;
+            background: #ccc;
+            border-radius: 50%;
+        }
+
+        .active {
+            width: 18px;
+            border-radius: 10px;
+            background: #79003c;
+        }
+
+        /* FOOTER */
+        .footer {
+            text-align: center;
+            font-size: 13px;
+            margin-top: 10px;
+        }
+
+        .link {
+            color: #a0004e;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        /* MODAL */
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+        }
+
+        /* FIXED BOTTOM SHEET STYLE */
+        .modal-content {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            /* center */
+
+            width: 85%;
+            max-width: 320px;
+
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 18px;
+
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+            animation: fadeIn 0.25s ease;
+        }
+
+        .modal-content h3 {
+            margin-top: 0;
+        }
+
+        .modal-body p {
+            margin-bottom: 10px;
+        }
+
+        body.modal-open {
+            overflow: hidden;
+        }
+
+        .modal-body {
+            max-height: 200px;
+            overflow-y: auto;
+            font-size: 14px;
+        }
+
+        .modal-content button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 10px;
+            border-radius: 12px;
+            border: none;
+        }
+
+        .primary-btn {
+            background: #79003c;
+            color: white;
+        }
+
+        .secondary-btn {
+            background: #eee;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -60%);
+            }
+
+            to {
+                opacity: 1;
+                transform: translate(-50%, -50%);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <body>
+
+        <div class="main-content">
+
+            <!-- HEADER -->
+            <div class="top-bar">
+                <div class="header-left">
+                    <img src="{{ url_for('static', filename='images/logo.jpg') }}">
+                    <span>I'M SAFE</span>
+                </div>
+            </div>
+
+            <!-- 🔥 SKIP BELOW HEADER -->
+            <div class="skip-container">
+                <button class="skip-top" onclick="window.location.href='/login'">Skip</button>
+            </div>
+
+            <!-- CONTENT -->
+            <div class="center-content">
+                <div class="title">Relief When You Need It</div>
+
+                <div class="illustration">
+                    <img src="{{ url_for('static', filename='images/welcome.jpg') }}">
+                </div>
+
+                <div class="subtext">
+                    Get instant comfort and support from your trusted circle.
+                    You're never alone — help is always within reach.
+                </div>
+            </div>
+
+            <!-- BUTTON -->
+            <div class="bottom-area">
+                <button class="btn-next" id="nextBtn">Next</button>
+
+                <div class="dots">
+                    <div class="dot"></div>
+                    <div class="dot active"></div>
+                    <div class="dot"></div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- TERMS MODAL -->
+        <div id="termsModal" class="modal">
+            <div class="modal-content">
+                <h3 style="color:#a0004e;">Terms of Service</h3>
+
+                <div class="modal-body">
+                    <p>By using I'M SAFE, you agree to use it responsibly for safety purposes only.</p>
+                    <p>Misuse such as fake alerts may result in account suspension.</p>
+                    <p>We aim for accuracy but cannot guarantee real-time updates in all situations.</p>
+                </div>
+
+                <button class="primary-btn" onclick="acceptTerms()">Accept & Continue</button>
+                <button class="secondary-btn" onclick="closeModal('termsModal')">Close</button>
+            </div>
+        </div>
+
+        <!-- PRIVACY -->
+        <div id="privacyModal" class="modal">
+            <div class="modal-content">
+                <h3 style="color:#a0004e;">Privacy Policy</h3>
+
+                <div class="modal-body">
+                    <p>Your data is secure. Location is only shared during emergency features.</p>
+                    <p>We do not sell or misuse your personal information.</p>
+                </div>
+
+                <button class="primary-btn" onclick="closeModal('privacyModal')">Close</button>
+            </div>
+        </div>
+
+        <script>
+            function openModal(id) {
+                document.getElementById(id).style.display = "block";
+                document.body.classList.add("modal-open"); // lock scroll
+            }
+
+            function closeModal(id) {
+                document.getElementById(id).style.display = "none";
+                document.body.classList.remove("modal-open");
+            }
+
+            function acceptTerms() {
+                closeModal('termsModal');
+
+                const btn = document.getElementById("nextBtn");
+                const msg = document.getElementById("termsMsg");
+
+                btn.disabled = false;
+                msg.style.display = "none";
+            }
+
+            window.onload = () => {
+                openModal('termsModal');
+
+                document.getElementById("nextBtn").onclick = () => {
+                    if (!document.getElementById("nextBtn").disabled) {
+                        window.location.href = "/response";
+                    }
+                };
+            };
+        </script>
+
+    </body>
+
+</html>

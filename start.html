@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Start Page - I'M SAFE</title>
+
+    <style>
+        :root {
+            --primary-color: #7b003d;
+            --accent-color: #a0004e;
+            --text-main: #333;
+            --text-muted: #666;
+            --bg-color: #ffffff;
+        }
+
+        body {
+            font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+        }
+
+        /* APP STYLE CONTAINER */
+        .main-wrapper {
+            width: 100%;
+            max-width: 420px;
+            margin: auto;
+            /* center like mobile */
+            padding: 20px;
+            box-sizing: border-box;
+            text-align: center;
+        }
+
+        /* HEADER */
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            /* LEFT ALIGN */
+            gap: 10px;
+            padding: 10px 5px;
+
+            background: white;
+            border-bottom: 1px solid #eee;
+
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .header img {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            object-fit: cover;
+        }
+
+        .header h2 {
+            font-size: 1rem;
+            color: var(--accent-color);
+            margin: 0;
+            font-weight: 600;
+        }
+
+        /* TITLE */
+        .title {
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin-top: 10px;
+        }
+
+        /* IMAGE */
+        .illustration {
+            margin: 20px 0;
+        }
+
+        .illustration img {
+            width: 100%;
+            max-width: 260px;
+            border-radius: 18px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+        }
+
+        /* TEXT */
+        .desc {
+            font-size: 1rem;
+            color: var(--text-muted);
+            margin-top: 10px;
+            font-weight: 500;
+        }
+
+        /* BUTTON */
+        .btn-start {
+            width: 100%;
+            padding: 14px;
+            margin-top: 25px;
+            background: linear-gradient(135deg, #a0004e, #7b003d);
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(123, 0, 61, 0.3);
+            transition: all 0.2s ease;
+        }
+
+        .btn-start:hover {
+            transform: translateY(-2px);
+        }
+
+        /* DOTS */
+        .dots {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            margin-top: 15px;
+        }
+
+        .dot {
+            width: 6px;
+            height: 6px;
+            background: #ccc;
+            border-radius: 50%;
+        }
+
+        .active {
+            width: 20px;
+            border-radius: 10px;
+            background: var(--primary-color);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="main-wrapper">
+
+        <div class="header">
+            <img src="{{ url_for('static', filename='images/logo.jpg') }}" alt="Logo">
+            <h2>I'M SAFE</h2>
+        </div>
+
+        <div class="title">Peace of Mind, by Design</div>
+
+        <div class="illustration">
+            <img src="{{ url_for('static', filename='images/start.jpg') }}" alt="Start Image">
+        </div>
+
+        <div class="desc">Private. Trusted. Yours.</div>
+
+        <button class="btn-start" onclick="window.location.href='/login'">
+            Get Started
+        </button>
+
+        <div class="dots">
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot active"></div>
+        </div>
+
+    </div>
+
+</body>
+
+</html>

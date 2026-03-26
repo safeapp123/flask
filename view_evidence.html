@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emergency Evidence Viewer - I'M SAFE</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #0f172a;
+            color: white;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+        }
+
+        .alert-header {
+            background: #be123c;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        video {
+            width: 100%;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            background: black;
+        }
+
+        .info-card {
+            background: #1e293b;
+            padding: 20px;
+            border-radius: 16px;
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        .btn-call {
+            display: block;
+            background: #10b981;
+            color: white;
+            text-decoration: none;
+            padding: 15px;
+            border-radius: 12px;
+            font-weight: bold;
+            margin-top: 15px;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="alert-header">
+            <i class="fas fa-exclamation-triangle"></i>
+            <strong>EMERGENCY VIDEO ALERT</strong>
+        </div>
+
+        <video controls autoplay>
+            <source src="{{ url_for('static', filename='recordings/' + filename) }}" type="video/webm">
+            Your browser does not support the video tag.
+        </video>
+
+        <div class="info-card">
+            <h3 style="margin-top: 0; color: #fb7185;">Evidence Details</h3>
+            <p><i class="fas fa-clock"></i> <strong>Recorded:</strong> Just now</p>
+
+            <div style="margin-top: 15px; padding: 12px; background: #0f172a; border-radius: 8px;">
+                <p style="margin: 0 0 8px 0; color: #38bdf8; font-size: 13px; font-weight: bold;">
+                    <i class="fas fa-location-dot"></i> SENDER LOCATION:
+                </p>
+                <a id="mapLink" href="#" target="_blank"
+                    style="color: white; font-size: 14px; text-decoration: underline;">
+                    Fetching location...
+                </a>
+            </div>
+
+            <p style="margin-top:15px;"><i class="fas fa-shield-alt"></i> This video was captured via the I'M SAFE
+                monitoring system.</p>
+
+            <a href="tel:112" class="btn-call"><i class="fas fa-phone"></i> Call Emergency Services</a>
+        </div>
+    </div>
+
+    <script>
+        // Extract coordinates from the URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const lat = urlParams.get('lat');
+        const lon = urlParams.get('lon');
+
+        if (lat && lon) {
+            // Update the link to point to Google Maps
+            const mapUrl = `https://www.google.com/maps?q=${lat},${lon}`;
+            document.getElementById('mapLink').href = mapUrl;
+            document.getElementById('mapLink').innerText = `View on Google Maps (${lat}, ${lon})`;
+        } else {
+            document.getElementById('mapLink').innerText = "Location coordinates not provided.";
+            document.getElementById('mapLink').style.textDecoration = "none";
+            document.getElementById('mapLink').removeAttribute('href');
+        }
+    </script>
+</body>
+
+</html>

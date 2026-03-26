@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Splash Screen</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <script>
+        setTimeout(() => {
+            window.location.href = "/welcome";
+        }, 3000);
+    </script>
+
+    <style>
+        body {
+            margin: 0;
+            background: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: "Segoe UI", Arial, sans-serif;
+            text-align: center;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        /* RESPONSIVE LOGO */
+        .logo {
+            width: 40vw;
+            /* scales with screen */
+            max-width: 200px;
+            /* max size */
+            min-width: 120px;
+            /* minimum size */
+            height: auto;
+        }
+
+        h1 {
+            color: #a0004e;
+            margin-top: 15px;
+            font-size: clamp(20px, 5vw, 28px);
+            /* responsive text */
+            letter-spacing: 1px;
+        }
+
+        /* ANIMATION */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* OPTIONAL: small devices spacing fix */
+        @media (max-width: 480px) {
+            h1 {
+                margin-top: 10px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <img src="{{ url_for('static', filename='images/logo.jpg') }}" class="logo">
+        <h1>I'M SAFE</h1>
+    </div>
+
+</body>
+
+</html>

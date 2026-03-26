@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Verify OTP</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        body {
+            background-color: #fff5fb;
+            font-family: 'Segoe UI', Arial;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .box {
+            width: 350px;
+            background: white;
+            padding: 35px 25px;
+            border-radius: 20px;
+            border: 1px solid #fbcfe8;
+            box-shadow: 0 10px 25px rgba(212, 0, 108, 0.08);
+            text-align: center;
+            transition: 0.3s;
+        }
+
+        .box:hover {
+            transform: translateY(-2px);
+        }
+
+        h2 {
+            color: #d4006c;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            font-size: 13px;
+            color: #64748b;
+            margin-bottom: 20px;
+        }
+
+        .back {
+            display: block;
+            text-align: left;
+            color: #d4006c;
+            font-size: 14px;
+            margin-bottom: 10px;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .otp-container {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px 0 25px 0;
+        }
+
+        .otp-box {
+            width: 45px;
+            height: 50px;
+            font-size: 20px;
+            text-align: center;
+            border-radius: 10px;
+            border: 2px solid #e2e8f0;
+            transition: 0.2s;
+        }
+
+        .otp-box:focus {
+            outline: none;
+            border-color: #d4006c;
+            box-shadow: 0 0 0 2px rgba(212, 0, 108, 0.1);
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(to right, #ff2d8d, #d4006c);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        .error {
+            color: #ed4956;
+            margin-top: 12px;
+            font-size: 14px;
+            animation: shake 0.3s;
+        }
+
+        @keyframes shake {
+            0% {
+                transform: translateX(0);
+            }
+
+            25% {
+                transform: translateX(-5px);
+            }
+
+            50% {
+                transform: translateX(5px);
+            }
+
+            75% {
+                transform: translateX(-5px);
+            }
+
+            100% {
+                transform: translateX(0);
+            }
+        }
+
+        .resend {
+            margin-top: 15px;
+            font-size: 13px;
+            color: #64748b;
+        }
+
+        .resend button {
+            background: none;
+            border: none;
+            color: #d4006c;
+            font-weight: bold;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="box">
+
+        <a href="/forgot_password" class="back">← Back</a>
+
+        <h2>Verify OTP</h2>
+        <p class="subtitle">Enter the 6-digit code sent to your email</p>
+
+        <form id="otpForm" action="/validate_reset_otp" method="POST">
+            <div class="otp-container">
+                <input class="otp-box" maxlength="1">
+                <input class="otp-box" maxlength="1">
+                <input class="otp-box" maxlength="1">
+                <input class="otp-box" maxlength="1">
+                <input class="otp-box" maxlength="1">
+                <input class="otp-box" maxlength="1">
+            </div>
+
+            <input type="hidden" name="otp" id="fullOtp">
+
+            <button type="submit">Verify & Continue</button>
+        </form>
+
+        {% if error %}
+        <p class="error">{{ error }}</p>
+        {% endif %}
+
+        <div class="resend">
+            Didn’t receive OTP?
+            <button onclick="resendOTP()">Resend</button>
+        </div>
+
+    </div>
+
+    <script>
+        const inputs = document.querySelectorAll(".otp-box");
+        const fullOtp = document.getElementById("fullOtp");
+
+        inputs.forEach((input, i) => {
+            input.addEventListener("input", () => {
+                input.value = input.value.replace(/[^0-9]/g, '');
+
+                if (input.value && i < inputs.length - 1) {
+                    inputs[i + 1].focus();
+                }
+
+                updateOTP();
+
+                // Auto submit when filled
+                if ([...inputs].every(i => i.value.length === 1)) {
+                    updateOTP();
+                    document.getElementById("otpForm").submit();
+                }
+            });
+
+            input.addEventListener("keydown", (e) => {
+                if (e.key === "Backspace" && i > 0 && !input.value) {
+                    inputs[i - 1].focus();
+                }
+            });
+        });
+
+        function updateOTP() {
+            let otp = "";
+            inputs.forEach(i => otp += i.value);
+            fullOtp.value = otp;
+        }
+
+        function resendOTP() {
+            fetch("/send_reset_otp", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({})
+            }).then(() => {
+                alert("OTP resent!");
+            });
+        }
+
+        inputs[0].focus();
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>I'M SAFE - Verify OTP</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+        body {
+            background-color: #fff5fb;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .box {
+            width: 350px;
+            background: white;
+            padding: 40px 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(212, 0, 108, 0.1);
+            border: 1px solid #fbcfe8;
+            text-align: center;
+        }
+
+        .icon-circle {
+            width: 60px;
+            height: 60px;
+            background: #fff0f6;
+            color: #d4006c;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 24px;
+        }
+
+        h3 {
+            color: #d4006c;
+        }
+
+        .otp-container {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px 0;
+        }
+
+        .otp-box {
+            width: 45px;
+            height: 50px;
+            text-align: center;
+            font-size: 22px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+        }
+
+        .otp-box:focus {
+            border-color: #d4006c;
+            outline: none;
+        }
+
+        button {
+            background-color: #d4006c;
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 12px;
+            width: 100%;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .resend {
+            margin-top: 15px;
+            font-size: 14px;
+        }
+
+        .resend button {
+            background: none;
+            border: none;
+            color: #d4006c;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .timer {
+            color: gray;
+        }
+
+        .error-alert {
+            background-color: #fee2e2;
+            color: #dc2626;
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-size: 14px;
+            border: 1px solid #fecaca;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        /* ❌ Shake animation */
+        @keyframes shake {
+            0% {
+                transform: translateX(0);
+            }
+
+            25% {
+                transform: translateX(-6px);
+            }
+
+            50% {
+                transform: translateX(6px);
+            }
+
+            75% {
+                transform: translateX(-6px);
+            }
+
+            100% {
+                transform: translateX(0);
+            }
+        }
+
+        /* Apply shake */
+        .shake {
+            animation: shake 0.4s;
+        }
+
+        /* Red border on error */
+        .otp-error {
+            border-color: #ef4444 !important;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="box">
+        <div class="icon-circle">
+            <i class="fas fa-shield-alt"></i>
+        </div>
+
+        <h3>Verify your Email</h3>
+        <p>Enter OTP sent to <br><b>{{ session.get('temp_email', 'your email') }}</b></p>
+
+        <form id="otpForm" action="/validate_otp" method="POST">
+            <div class="otp-container">
+                <input class="otp-box" maxlength="1" required type="text" inputmode="numeric">
+                <input class="otp-box" maxlength="1" required type="text" inputmode="numeric">
+                <input class="otp-box" maxlength="1" required type="text" inputmode="numeric">
+                <input class="otp-box" maxlength="1" required type="text" inputmode="numeric">
+                <input class="otp-box" maxlength="1" required type="text" inputmode="numeric">
+                <input class="otp-box" maxlength="1" required type="text" inputmode="numeric">
+            </div>
+
+            <input type="hidden" name="otp" id="fullOtp">
+            <button type="submit">Confirm & Continue</button>
+        </form>
+
+        {% if error %}
+        <div class="error-alert">
+            <i class="fas fa-exclamation-circle"></i> {{ error }}
+        </div>
+        {% endif %}
+
+        <div class="resend">
+            <span class="timer" id="timer">Resend in 30s</span><br>
+            <button onclick="resendOTP()" id="resendBtn" disabled>Resend OTP</button>
+        </div>
+    </div>
+
+    <script>
+        const inputs = document.querySelectorAll(".otp-box");
+        const fullOtp = document.getElementById("fullOtp");
+        const timerText = document.getElementById("timer");
+        const resendBtn = document.getElementById("resendBtn");
+
+        // Helper to update hidden input
+        function updateOTP() {
+            let otp = "";
+            inputs.forEach(input => otp += input.value);
+            fullOtp.value = otp;
+        }
+
+        // Auto move between boxes
+        inputs.forEach((input, index) => {
+            input.addEventListener("input", (e) => {
+                input.value = input.value.replace(/[^0-9]/g, '');
+                if (input.value.length === 1 && index < inputs.length - 1) {
+                    inputs[index + 1].focus();
+                }
+                updateOTP();
+            });
+
+            input.addEventListener("keydown", (e) => {
+                if (e.key === "Backspace" && index > 0 && !input.value) {
+                    inputs[index - 1].focus();
+                }
+            });
+        });
+
+        // Timer logic
+        let timeLeft = 30;
+        function startTimer() {
+            const countdown = setInterval(() => {
+                timeLeft--;
+                if (timerText) timerText.innerText = `Resend in ${timeLeft}s`;
+
+                if (timeLeft <= 0) {
+                    clearInterval(countdown);
+                    if (timerText) timerText.innerText = "";
+                    resendBtn.disabled = false;
+                }
+            }, 1000);
+        }
+        startTimer();
+
+        function resendOTP() {
+            const email = "{{ session.get('temp_email', '') }}";
+            if (!email) {
+                alert("Session expired. Please signup again.");
+                return;
+            }
+
+            fetch("/login_otp", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email: email })
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.status === "success") {
+                        alert("OTP resent!");
+                        timeLeft = 30;
+                        resendBtn.disabled = true;
+                        startTimer();
+                    } else {
+                        alert("Error: " + (data.message || "Could not resend OTP"));
+                    }
+                })
+                .catch(err => console.error("Resend Error:", err));
+        }
+
+        // Handle error states and autofocus
+    window.onload = function () {
+        const hasError = "{{ 'true' if error else 'false' }}";
+
+        if (hasError === "true") {
+            inputs.forEach(input => {
+                input.value = "";
+                input.classList.add("otp-error");
+            });
+
+            const container = document.querySelector(".otp-container");
+            container.classList.add("shake");
+
+            setTimeout(() => {
+                container.classList.remove("shake");
+            }, 500);
+        }
+
+        inputs[0].focus();
+    };
+    </script>
+</body>
+
+</html>

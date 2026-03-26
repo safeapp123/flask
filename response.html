@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Response Page - I'M SAFE</title>
+
+    <style>
+        :root {
+            --primary-color: #79003c;
+            --accent-color: #a0004e;
+            --text-main: #333;
+            --text-muted: #666;
+            --bg-color: #ffffff;
+        }
+
+        body {
+            font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding-top: 10px;
+            /* small top space like real apps */
+            min-height: 100vh;
+        }
+
+        /* MAIN CONTAINER */
+        .main-wrapper {
+            width: 100%;
+            max-width: 420px;
+            /* 🔥 app-like width */
+            padding: 20px;
+            box-sizing: border-box;
+            text-align: center;
+        }
+
+        /* HEADER */
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            /* 🔥 LEFT ALIGN */
+            gap: 10px;
+            padding: 10px 5px;
+        }
+
+        .header {
+            background: white;
+            border-bottom: 1px solid #eee;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .header img {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            object-fit: cover;
+        }
+
+        .header h2 {
+            font-size: 1rem;
+            color: var(--accent-color);
+            margin: 0;
+            font-weight: 600;
+        }
+
+        /* TITLE */
+        .title {
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin-top: 10px;
+        }
+
+        /* IMAGE */
+        .illustration {
+            margin: 20px 0;
+        }
+
+        .illustration img {
+            width: 100%;
+            max-width: 260px;
+            /* 🔥 smaller clean size */
+            border-radius: 18px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+        }
+
+        /* DIVIDER */
+        .divider {
+            margin: 20px auto;
+            width: 80%;
+            border-bottom: 1px solid #eee;
+        }
+
+        /* SUB TEXT */
+        .sub-heading {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .desc {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+            padding: 0 10px;
+        }
+
+        /* BUTTON */
+        .btn-next {
+            width: 100%;
+            padding: 14px;
+            margin-top: 25px;
+            background: linear-gradient(135deg, #a0004e, #79003c);
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(121, 0, 60, 0.3);
+            transition: all 0.2s ease;
+        }
+
+        .btn-next:hover {
+            transform: translateY(-2px);
+        }
+
+        /* DOTS */
+        .dots {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            margin-top: 15px;
+        }
+
+        .dot {
+            width: 6px;
+            height: 6px;
+            background: #ccc;
+            border-radius: 50%;
+        }
+
+        .active {
+            width: 20px;
+            border-radius: 10px;
+            background: var(--primary-color);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="main-wrapper">
+
+        <div class="header">
+            <img src="{{ url_for('static', filename='images/logo.jpg') }}" alt="Logo">
+            <h2>I'M SAFE</h2>
+        </div>
+
+        <div class="title">Care When It Counts</div>
+
+        <div class="illustration">
+            <img src="{{ url_for('static', filename='images/response.jpg') }}" alt="Response Image">
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="sub-heading">One tap for reassurance. Or response.</div>
+
+        <div class="desc">
+            Use SOS or a safety tag to let your Bubble know when something’s wrong – or when you’re okay.
+        </div>
+
+        <button class="btn-next" onclick="window.location.href='/reli'">Next</button>
+
+        <div class="dots">
+            <div class="dot"></div>
+            <div class="dot active"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+        </div>
+
+    </div>
+
+</body>
+
+</html>

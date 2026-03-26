@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Admin Dashboard</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            background: #f9fafb;
+            padding: 20px;
+        }
+
+        .nav {
+            background: #be185d;
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        h2 {
+            margin-bottom: 10px;
+            color: #1e293b;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            font-size: 13px;
+        }
+
+        th {
+            background: #f1f5f9;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="nav">
+        <h1>ADMIN DASHBOARD (ALL DATA)</h1>
+    </div>
+
+    <!-- USERS -->
+    <div class="container">
+        <h2>Users</h2>
+        <table>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Blood</th>
+            </tr>
+            {% for u in users %}
+            <tr>
+                <td>{{ u.id }}</td>
+                <td>{{ u.first_name }} {{ u.last_name }}</td>
+                <td>{{ u.email }}</td>
+                <td>{{ u.blood_group }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+    <!-- CONTACTS -->
+    <div class="container">
+        <h2>Emergency Contacts</h2>
+        <table>
+            <tr>
+                <th>User</th>
+                <th>Name</th>
+                <th>Phone</th>
+                <th>Email</th>
+            </tr>
+            {% for c in contacts %}
+            <tr>
+                <td>{{ c.user_email }}</td>
+                <td>{{ c.name }}</td>
+                <td>{{ c.phone }}</td>
+                <td>{{ c.contact_email }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+    <!-- RECORDINGS -->
+    <div class="container">
+        <h2>Recordings</h2>
+        <table>
+            <tr>
+                <th>User</th>
+                <th>File</th>
+                <th>Time</th>
+            </tr>
+            {% for r in recordings %}
+            <tr>
+                <td>{{ r.email }}</td>
+                <td>{{ r.file_name }}</td>
+                <td>{{ r.timestamp }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+    <!-- LIVE LOCATIONS -->
+    <div class="container">
+        <h2>Live Locations</h2>
+        <table>
+            <tr>
+                <th>User</th>
+                <th>Latitude</th>
+                <th>Longitude</th>
+                <th>Time</th>
+            </tr>
+            {% for l in locations %}
+            <tr>
+                <td>{{ l.user_email }}</td>
+                <td>{{ l.lat }}</td>
+                <td>{{ l.lon }}</td>
+                <td>{{ l.timestamp }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+    <!-- VOICE TRIGGERS -->
+    <div class="container">
+        <h2>Voice Triggers</h2>
+        <table>
+            <tr>
+                <th>User</th>
+                <th>Phrase</th>
+            </tr>
+            {% for t in triggers %}
+            <tr>
+                <td>{{ t.user_email }}</td>
+                <td>{{ t.trigger_phrase }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+    <!-- WATCHES -->
+    <div class="container">
+        <h2>Active Watches</h2>
+        <table>
+            <tr>
+                <th>User</th>
+                <th>Status</th>
+                <th>Expiry</th>
+            </tr>
+            {% for w in watches %}
+            <tr>
+                <td>{{ w.user_email }}</td>
+                <td>{{ w.status }}</td>
+                <td>{{ w.expiry_time }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+</body>
+
+</html>
